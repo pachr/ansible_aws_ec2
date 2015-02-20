@@ -1,0 +1,28 @@
+---
+######################
+# Add common packages
+######################
+- name: update cache
+  apt: update_cache=yes
+
+- name: Adding common packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - wget
+    - unzip
+    - python2.7
+
+######################
+# Time management
+######################
+- name: Set local timezone
+  copy: content={{ timezone }}
+            dest=/etc/timezone
+  notify: update tzdata
+
+- name: Install NTP (and update apt cache for the first install)
+  apt: name=ntp state=present
+           update_cache=yes
+
+- name: Start the ntp service
+  service: name=ntp state=started enabled=true

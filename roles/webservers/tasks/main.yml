@@ -1,0 +1,13 @@
+---
+###############################
+#Add packages for webservers
+###############################
+- name: Adding webserver packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - nginx
+    - rsync
+    - git
+
+- name: Add pip
+  apt: name=python-pip state=latest

@@ -1,0 +1,5 @@
+mongodb_nohttpinterface: "true"
+mongodb_bind_ip: "0.0.0.0"
+db_path: "/noodle/mongodb/data/db"
+log_path: "/noodle/mongodb/log"
+log_file_path: "/noodle/mongodb/log/mongodb.log"

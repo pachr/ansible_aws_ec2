@@ -1,0 +1,46 @@
+---
+#Create a security group on AWS EC2
+#my-security-group-test
+- name: Create security group
+  hosts: 127.0.0.1 #127.0.0.1 in hosts file
+  connection: local
+  gather_facts: False
+  roles:
+    - ec2_provisionning
+  tags:
+    - security_group #We can skip it 
+
+#Launch one instance
+- name: Spin up instances
+  hosts: local #127.0.0.1 in hosts file
+  connection: local
+  gather_facts: False
+  roles:
+    - ec2_launch_instances
+  tags:
+    - launch_instances
+
+#Configure instance
+#Common packages
+#And webservers packages
+- name: Configure instances
+  hosts: launched # This uses the hosts that we put into the in-memory hosts repository with the add_host module.
+  gather_facts: True
+  sudo: yes #passwordless on AWS
+  remote_user: ubuntu #default user for Ubuntu images on AWS
+  roles:
+    - common
+    - webservers
+  tags:
+    - configuration
+
+#Installation and configuration - MongoDB
+- name: Install MongoDB
+  hosts: launched
+  gather_facts: True
+  sudo: yes
+  remote_user: ubuntu
+  roles:
+    - mongoDB_servers
+  tags:
+    - mongoDB

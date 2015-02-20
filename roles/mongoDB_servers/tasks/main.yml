@@ -1,0 +1,31 @@
+---
+- name: MongoDB | Fetch 10Gen signing key
+  command: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+
+- name: MongoDB | Add 10Gen repository
+  shell: 
+    echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/10gen.list
+    creates=/etc/apt/sources.list.d/10gen.list
+
+- name: MongoDB | Install latest MongoDB release 
+  apt: pkg=mongodb-10gen state=present update_cache=yes
+
+- name: MongoDB | create folders log
+  file:
+    path={{log_path}} state=directory recurse=yes owner=ubuntu mode=0755
+
+- name: Prepare the database directory
+  action: file path={{db_path}} state=directory recurse=yes owner=ubuntu mode=0755
+
+- name: Create log file
+  action: file path={{log_file_path}} state=touch owner=ubuntu mode=0755
+
+- name: Template the MongoDB configuration file
+  template:
+    src=mongodb.conf.j2 dest=/etc/mongod.conf
+    owner=root group=root mode=0644
+  notify:
+  - mongodb-restart
+
+- name: Configure MongoDB
+  action: service name=mongodb state=started enabled=yes
