@@ -12,13 +12,13 @@
 
 - name: MongoDB | create folders log
   file:
-    path={{log_path}} state=directory recurse=yes owner=ubuntu mode=0755
+    path={{log_path}} state=directory recurse=yes owner="{{remote_user}}" mode=0755
 
 - name: Prepare the database directory
-  action: file path={{db_path}} state=directory recurse=yes owner=ubuntu mode=0755
+  action: file path={{db_path}} state=directory recurse=yes owner="{{remote_user}}" mode=0755
 
 - name: Create log file
-  action: file path={{log_file_path}} state=touch owner=ubuntu mode=0755
+  action: file path={{log_file_path}} state=touch owner="{{remote_user}}" mode=0755
 
 - name: Template the MongoDB configuration file
   template:

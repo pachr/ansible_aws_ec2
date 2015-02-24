@@ -1,0 +1,41 @@
+---
+- name: Install MySQL
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - python-mysqldb
+    - mysql-server
+
+- name: Create the directory /etc/mysql/conf.d
+  file: path=/etc/mysql/conf.d state=directory
+  notify:
+   - mysql_restart
+
+- name: Copy the my.cnf file 
+  template: src=my.cnf.j2 dest=/etc/mysql/my.cnf
+
+- name: Start the MySQL service
+  sudo: yes
+  service: 
+    name: mysql 
+    state: started
+    enabled: true
+
+- name: update mysql root password for all root accounts
+  mysql_user: 
+    check_implicit_admin: true
+    host: "{{ item }}"
+    login_password: "{{ mysql_root_password }}"
+    login_user: "{{mysql_root_user}}"
+    name: "{{mysql_owner}}"
+    password: "{{ mysql_root_password }}"
+    priv: "*.*:ALL,GRANT"
+  with_items: 
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+# - name: copy .my.cnf file with root password credentials
+#   template: src=.my.cnf.j2 dest=~/.my.cnf owner=root mode=0600
+
